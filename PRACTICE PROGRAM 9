@@ -1,0 +1,10 @@
+#include <stdio.h>
+int q[5], f = 0, r = -1;
+int main() {
+    q[++r] = 10;
+    q[++r] = 20;
+    q[++r] = 30;
+    for (int i = f; i <= r; i++)
+        printf("%d ", q[i]);
+    return 0;
+}
