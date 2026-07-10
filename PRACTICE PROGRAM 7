@@ -1,0 +1,8 @@
+#include <stdio.h>
+int main() {
+    int memory[5] = {100, 200, 300, 400, 500};
+    int process[3] = {50, 150, 250};
+    for (int i = 0; i < 3; i++)
+        printf("Process %d -> Memory Block %d\n", i + 1, i + 1);
+    return 0;
+}
