@@ -1,0 +1,11 @@
+#include <stdio.h>
+#include <pthread.h>
+void *a(){ printf("1 3 "); }
+void *b(){ printf("2 4 "); }
+int main() {
+    pthread_t t1, t2;
+    pthread_create(&t1, 0, a, 0);
+    pthread_create(&t2, 0, b, 0);
+    pthread_join(t1, 0);
+    pthread_join(t2, 0);
+}
