@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+int main()
+{
+    int pid = fork();
+    if(pid == 0)
+    {
+        printf("Child Process Running\n");
+    }
+    else
+    {
+        wait(NULL);
+        printf("Parent Process Resumed\n");
+    }
+    return 0;
+}
