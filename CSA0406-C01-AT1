@@ -1,0 +1,76 @@
+NAME:S.ROHINI
+REG.NO:192424413
+
+1.(A):- * TYPE: Multi-user Time-Sharing Operating System
+        * JUSTIFICATION: It allows multiple users to execute programs simultaneously by sharing CPU time efficiently.
+two responsibilities of the kernel in managing multiple user processes.
+  (B):- TWO RESPONSIBILITIES OF THE KERNEL IN MANAGING MULTIPLE USER PROCESSES:
+        * Process scheduling and CPU allocation.
+        * Memory management and resource allocation.
+  (C):- PSEUDOCODE:
+           START
+           Create a child process using fork()
+           If process is Child
+               Display Child Process ID
+           Else
+               Display Parent Process ID
+           End If
+           STOP
+
+2.(A):- REQUIRED SYSTEM CALLS:
+            * create()
+            * write()
+            * read()
+            * close()
+  (B):- PURPOSE OF ANY TWO FILE MANAGEMENT SYSTEM CALLS:
+            * write() - Writes data into a file.
+            * read() - Reads data from a file.
+  (c):- PSEUDOCODE:
+            START 
+            Create a file "student.txt"
+            Write "Student Name" into the file
+            Close the file
+            STOP
+
+3.(A):- REQUIRED SYSTEM CALLS:
+           * open()
+           * read()
+           * write()
+           * close()
+  (B):- EXPLAIN ANY TWO:
+          * open() - Opens an existing file.
+          * write() - Writes data to the destination file.
+  (c):- PSEUDOCODE:
+            START
+            Open Source
+            Open Destination
+            Read → Write
+            Close Files
+            STOP
+
+4.(A):- PURPOSE OF fork() AND exec() OF SYSTEM CALLS:
+         * fork() - Creates a new child process.
+         * exec() - Replaces the current process with a new program.
+  (B):- ROLE OF wait():
+         --> wait() makes the parent process wait until the child process finishes execution.
+  (C):- PSEUDOCODE:
+            START
+            fork()
+            Child → exec()
+            Parent → wait()
+            STOP
+
+5.(A):- IMPORTANCE OF FILE MANAGEMENT IN OPERATING SYSTEMS:
+          * It Organizes the files efficiently.
+          * It Provides a secure storage.
+          * It Manages access permissions.
+          * It Prevents the data loss.
+  (B):- PURPOSE OF THE open() AND close() OF THE SYSTEM CALLS:
+          * open() - Opens a file for reading or writing.
+          * close() - Closes the opened file and releases system resources.
+  (C):- PSEUDOCODE: 
+            START
+            Open File
+            Read File
+            Close File
+            STOP
