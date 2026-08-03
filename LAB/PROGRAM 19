@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <pthread.h>
+pthread_mutex_t mutex;
+int count = 0;
+void *display(void *arg)
+{
+    pthread_mutex_lock(&mutex);
+    count++;
+    printf("Counter = %d\n", count);
+    pthread_mutex_unlock(&mutex);
+    return NULL;
+}
+int main()
+{
+    pthread_t t1, t2;
+    pthread_mutex_init(&mutex, NULL);
+    pthread_create(&t1, NULL, display, NULL);
+    pthread_create(&t2, NULL, display, NULL);
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+    pthread_mutex_destroy(&mutex);
+    return 0;
+}
