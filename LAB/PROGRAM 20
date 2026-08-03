@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
+sem_t wrt;
+int data;
+void *writer(void *arg)
+{
+    sem_wait(&wrt);
+    printf("Enter data to write: ");
+    scanf("%d", &data);
+    printf("Writer writes: %d\n", data);
+    sem_post(&wrt);
+    return NULL;
+}
+void *reader(void *arg)
+{
+    sem_wait(&wrt);
+    printf("Reader reads: %d\n", data);
+    sem_post(&wrt);
+    return NULL;
+}
+int main()
+{
+    pthread_t w, r;
+    sem_init(&wrt, 0, 1);
+    pthread_create(&w, NULL, writer, NULL);
+    pthread_join(w, NULL);
+    pthread_create(&r, NULL, reader, NULL);
+    pthread_join(r, NULL);
+    sem_destroy(&wrt);
+    return 0;
+}
