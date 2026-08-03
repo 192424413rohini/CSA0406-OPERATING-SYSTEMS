@@ -1,0 +1,26 @@
+#include<stdio.h>
+#include<sys/ipc.h>
+#include<sys/msg.h>
+#include<string.h>
+
+struct msg
+{
+    long type;
+    char text[50];
+}m;
+
+int main()
+{
+    int id=msgget(1234,0666|IPC_CREAT);
+
+    m.type=1;
+    strcpy(m.text,"Hello");
+
+    msgsnd(id,&m,sizeof(m),0);
+
+    msgrcv(id,&m,sizeof(m),1,0);
+
+    printf("%s\n",m.text);
+
+    return 0;
+}
