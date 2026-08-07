@@ -1,0 +1,167 @@
+NAME: S.ROHINI
+REG.NO: 192424413
+CSA0406 - OPERATING SYSTEMS
+C03_AT1
+DATE: 07-8-2026
+
+1. Logical Address to Physical Address using Base and Limit Registers:
+CODE:
+#include <stdio.h>
+int main() {
+    int base, limit, logical, physical;
+    printf("Enter Base Register: ");
+    scanf("%d", &base);
+    printf("Enter Limit Register: ");
+    scanf("%d", &limit);
+    printf("Enter Logical Address: ");
+    scanf("%d", &logical);
+    if (logical >= 0 && logical < limit) {
+        physical = base + logical;
+        printf("Valid Logical Address\n");
+        printf("Physical Address = %d\n", physical);
+    } else {
+        printf("Invalid Logical Address! Memory Access Denied.\n");
+    }
+    return 0;
+}
+OUTPUT:
+Enter Base Register: 3
+Enter Limit Register: 6
+Enter Logical Address: 4
+Valid Logical Address
+Physical Address = 7
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+2. Paging Memory Management Scheme:
+CODE:
+#include <stdio.h>
+int main() {
+    int pageTable[10], n, page, offset, frame, pageSize;
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+    printf("Enter page size: ");
+    scanf("%d", &pageSize);
+    printf("Enter Frame Number for each Page:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Page %d -> Frame: ", i);
+        scanf("%d", &pageTable[i]);
+    }
+    printf("Enter Page Number: ");
+    scanf("%d", &page);
+    printf("Enter Offset: ");
+    scanf("%d", &offset);
+    if (page >= n || offset >= pageSize) {
+        printf("Invalid Page Number or Offset.\n");
+    } else {
+        frame = pageTable[page];
+        printf("Frame Number = %d\n", frame);
+        printf("Physical Address = %d\n", frame * pageSize + offset);
+    }
+    return 0;
+}
+OUTPUT:
+Enter number of pages: 4
+Enter page size: 100
+Enter Frame Number for each Page:
+Page 0 -> Frame: 4
+Page 1 -> Frame: 7
+Page 2 -> Frame: 9
+Page 3 -> Frame: 2
+Enter Page Number: 2
+Enter Offset: 45
+Frame Number = 9
+Physical Address = 945
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+3. Page Table Simulation
+CODE:
+#include <stdio.h>
+int main() {
+    int n, pageTable[20];
+    int logicalAddress, pageSize;
+    int pageNo, offset;
+    printf("Enter Number of Pages: ");
+    scanf("%d", &n);
+    printf("Enter Page Size: ");
+    scanf("%d", &pageSize);
+    printf("Enter Frame Number for each Page:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Page %d -> ", i);
+        scanf("%d", &pageTable[i]);
+    }
+    printf("Enter Logical Address: ");
+    scanf("%d", &logicalAddress);
+    pageNo = logicalAddress / pageSize;
+    offset = logicalAddress % pageSize;
+    if (pageNo >= n) {
+        printf("Invalid Logical Address\n");
+    } else {
+        printf("Page Number = %d\n", pageNo);
+        printf("Frame Number = %d\n", pageTable[pageNo]);
+        printf("Physical Address = %d\n",
+               pageTable[pageNo] * pageSize + offset);
+    }
+    return 0;
+}
+OUTPUT:
+Enter Number of Pages: 3
+Enter Page Size: 10
+Enter Frame Number for each Page:
+Page 0 -> 3
+Page 1 -> 6
+Page 2 -> 9
+Enter Logical Address: 1
+Page Number = 0
+Frame Number = 3
+Physical Address = 31
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+4. Translation Lookaside Buffer (TLB) Simulation:
+CODE:
+#include <stdio.h>
+int main() {
+    float memoryAccessTime, tlbAccessTime;
+    float hitRatio, withoutTLB, withTLB;
+    printf("Enter Memory Access Time (ns): ");
+    scanf("%f", &memoryAccessTime);
+    printf("Enter TLB Access Time (ns): ");
+    scanf("%f", &tlbAccessTime);
+    printf("Enter TLB Hit Ratio (0 to 1): ");
+    scanf("%f", &hitRatio);
+    withoutTLB = 2 * memoryAccessTime;
+    withTLB = hitRatio * (tlbAccessTime + memoryAccessTime)
+            + (1 - hitRatio) * (tlbAccessTime + 2 * memoryAccessTime);
+    printf("\nWithout TLB = %.2f ns\n", withoutTLB);
+    printf("With TLB = %.2f ns\n", withTLB);
+    return 0;
+}
+OUTPUT:
+Enter Memory Access Time (ns): 100
+Enter TLB Access Time (ns): 20
+Enter TLB Hit Ratio (0 to 1): 0.8
+Without TLB = 200.00 ns
+With TLB = 140.00 ns
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+5. Memory Protection using Base and Limit Registers:
+CODE:
+#include <stdio.h>
+int main() {
+    int base, limit, logicalAddress;
+    printf("Enter Base Register: ");
+    scanf("%d", &base);
+    printf("Enter Limit Register: ");
+    scanf("%d", &limit);
+    printf("Enter Logical Address: ");
+    scanf("%d", &logicalAddress);
+    if (logicalAddress >= 0 && logicalAddress < limit) {
+        printf("Access Allowed\n");
+        printf("Physical Address = %d\n", base + logicalAddress);
+    } else {
+        printf("Access Denied! Address is outside the allowed range.\n");
+    }
+    return 0;
+}
+OUTPUT:
+Enter Base Register: 4
+Enter Limit Register: 7
+Enter Logical Address: 3
+Access Allowed
+Physical Address = 7
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
