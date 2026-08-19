@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <string.h>
+int main() {
+    char files[20][20], name[20];
+    int n = 0, choice;
+    while (1) {
+        printf("\n1.Create File  2.Display  3.Exit\n");
+        scanf("%d", &choice);
+        if (choice == 1) {
+            printf("Enter file name: ");
+            scanf("%s", name);
+            strcpy(files[n++], name);
+            printf("File created.\n");
+        }
+        else if (choice == 2) {
+            printf("Files in directory:\n");
+            for (int i = 0; i < n; i++)
+                printf("%s\n", files[i]);
+        }
+        else
+            break;
+    }
+    return 0;
+}
