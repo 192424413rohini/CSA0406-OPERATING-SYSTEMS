@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <string.h>
+int main() {
+    char users[10][20], files[10][10][20];
+    int u, f, choice;
+    printf("Enter number of users: ");
+    scanf("%d", &u);
+    for (int i = 0; i < u; i++) {
+        printf("Enter user name: ");
+        scanf("%s", users[i]);
+        printf("Enter number of files: ");
+        scanf("%d", &f);
+        for (int j = 0; j < f; j++) {
+            printf("Enter file name: ");
+            scanf("%s", files[i][j]);
+        }
+    }
+    printf("\nTwo-Level Directory:\n");
+    for (int i = 0; i < u; i++) {
+        printf("%s:\n", users[i]);
+        for (int j = 0; j < f; j++)
+            printf("  %s\n", files[i][j]);
+    }
+    return 0;
+}
