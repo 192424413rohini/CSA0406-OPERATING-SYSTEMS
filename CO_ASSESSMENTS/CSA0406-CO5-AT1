@@ -1,0 +1,348 @@
+NAME:S.ROHINI
+REG.NO:192424413
+CODE:CSA0406
+C05-AT1
+
+Q1. Optimized Linux File System Layout and Storage Management
+  The given Linux server has a total storage capacity of 50 GB. The storage has to be used for system files, user files, application data, and rapidly growing log files. Since the log files should not exceed 10 GB, proper partitioning and log management are required.
+Proposed Partitioning:
+Partition	        Size	          Purpose
+/boot	            1 GB	     Stores boot and kernel files
+/	                12 GB	     Linux operating system files
+/var/log	        10 GB	     System and application logs
+/home	            8 GB	     User files
+/opt	            8 GB	     Application files
+swap	            4 GB	     Virtual memory
+Reserved	        7 GB	     Emergency and future use
+Total	            50 GB	
+  The /var/log directory is given a separate 10 GB partition. This is useful because if the log files grow rapidly, they will not occupy the space of the root filesystem.
+File System Layout:
+                 50 GB DISK
+                      |
+       +--------------+--------------+
+       |              |              |
+    SYSTEM           LOGS       APPLICATION/USER
+       |              |              |
+   /boot  1 GB     /var/log       /home  8 GB
+   /      12 GB      10 GB         /opt   8 GB
+                       |
+                   Log Rotation
+Log Rotation
+  Linux provides the logrotate utility for automatically managing log files. It can rotate, compress, and remove old logs.
+Example:
+/var/log/*.log {
+    daily
+    rotate 7
+    size 1G
+    compress
+    missingok
+    notifempty
+}
+Here, logs are rotated daily, old logs are retained for a limited period, and older logs are compressed to save disk space.
+Useful Linux Commands:
+->To check available disk space:
+df -h
+->To check the size of log files:
+du -sh /var/log/*
+->To view disk partitions:
+lsblk
+->To manually perform log rotation:
+sudo logrotate -f /etc/logrotate.conf
+Monitoring Log Usage:
+The administrator can monitor the /var/log partition using:
+df -h /var/log
+A simple shell script can provide a warning when usage becomes high:
+#!/bin/bash
+USAGE=$(df /var/log | awk 'NR==2 {print $5}' | tr -d '%')
+if [ "$USAGE" -ge 80 ]; then
+    echo "Warning: Log storage is ${USAGE}% full"
+else
+    echo "Log storage is normal: ${USAGE}%"
+fi
+    This helps the administrator take action before the filesystem becomes completely full.
+Conclusion:
+  The proposed partitioning separates the operating system, user data, applications, and logs. Allocating 10 GB specifically for /var/log ensures that log files do not consume the entire disk. Using logrotate, compression, and regular disk monitoring helps control storage usage and prevents disk exhaustion from affecting critical services.
+
+Q2. Linux Kernel-Level Optimization for High CPU Workloads
+  A Linux system is handling a high CPU workload and is facing delays because of frequent context switching. Since hardware upgrades are not possible, the system has to be improved using kernel-level optimization. At the same time, the system must support real-time processing.
+Problem Analysis
+  * Context switching happens when the CPU changes from one process or thread to another. If it happens too frequently, the CPU spends more time switching between processes instead of performing useful work. This can reduce performance and increase delays in real-time applications.
+  * The main solution is to tune the Linux scheduler and control which processes get CPU time.
+1. Scheduler Tuning:
+Linux provides scheduling policies for controlling how processes use the CPU. For real-time applications, FIFO and Round Robin scheduling can be used.
+For example:
+sudo chrt -f 80 ./realtime_app
+Here, -f uses the SCHED_FIFO policy and 80 is the priority.
+Round Robin scheduling can be used with:
+sudo chrt -r 80 ./realtime_app
+This gives important real-time applications higher scheduling priority.
+2. CPU Affinity:
+CPU affinity allows a process to run on a particular CPU core. This can reduce unnecessary movement of processes between cores.
+taskset -c 2 ./realtime_app
+For an already running process:
+taskset -cp 2 1234
+Here, 1234 represents the process ID.
+3. Kernel Module Management:
+Kernel modules provide additional functionality to the Linux kernel. Unnecessary modules should not be loaded because they may consume system resources.
+To view loaded modules:
+lsmod
+To load a required module:
+sudo modprobe module_name
+To remove an unnecessary module:
+sudo modprobe -r module_name
+Only required modules should be maintained in a high-performance system.
+4. Monitor CPU and Context Switching:
+The administrator can monitor CPU usage using:
+top
+or:
+htop
+Context switching can be observed using:
+vmstat 1
+The cs value shows the number of context switches.
+If the value is very high, the administrator should identify the processes responsible and adjust their scheduling or CPU allocation.
+Optimization Approach:
+High CPU Workload
+       |
+       v
+Monitor CPU & Processes
+       |
+       v
+Identify Excessive Context Switching
+       |
+       v
+Scheduler Tuning
+       |
+       +----------------+
+       |                |
+       v                v
+ Real-Time Priority   CPU Affinity
+     chrt               taskset
+       |                |
+       +-------+--------+
+               |
+               v
+       Reduced Switching
+               |
+               v
+      Better Real-Time Performance
+Conclusion
+  Since hardware upgrades are not possible, Linux kernel-level techniques such as scheduler tuning, real-time scheduling, CPU affinity, kernel-module management, and performance monitoring can be used to improve the system. Giving suitable priority to real-time processes and reducing unnecessary context switching helps improve CPU efficiency and reduce processing delays.
+
+Q3. Efficient Shell Script for Processing 1 Million Log Entries
+  A Linux administrator has to process 1 million log entries per day using only shell scripting. The main requirement is that the script should complete the processing within 2 minutes. Therefore, the solution should use efficient Linux commands and avoid unnecessary processing.
+Approach
+  For processing a large number of log entries, commands such as awk, grep, sort, and wc can be used. Among these, awk is useful because it can search, filter, and count data in a single operation, reducing the number of times the file has to be read.
+Suppose the log file is:
+/var/log/application.log
+Shell Script
+#!/bin/bash
+LOGFILE="/var/log/application.log"
+echo "Processing log file..."
+TOTAL=$(awk 'END {print NR}' "$LOGFILE")
+ERRORS=$(awk '/ERROR/ {count++} END {print count+0}' "$LOGFILE")
+WARNINGS=$(awk '/WARNING/ {count++} END {print count+0}' "$LOGFILE")
+echo "Total entries : $TOTAL"
+echo "Errors        : $ERRORS"
+echo "Warnings      : $WARNINGS"
+The script reads the log file and counts the total number of entries, errors, and warnings.
+More Efficient Processing
+Instead of repeatedly using several commands such as:
+grep ERROR logfile | wc -l
+grep WARNING logfile | wc -l
+wc -l logfile
+we can use one awk operation to process the file once:
+awk '
+/ERROR/   { errors++ }
+/WARNING/ { warnings++ }
+{ total++ }
+END {
+    print "Total:", total
+    print "Errors:", errors
+    print "Warnings:", warnings
+}' /var/log/application.log
+      This approach is better for a large log file because the file is scanned only once.
+Performance Optimization:
+  To process 1 million entries within 2 minutes, the following techniques should be followed:
+    * Use awk for filtering and counting instead of multiple commands.
+    * Avoid unnecessary pipelines.
+    * Avoid creating temporary files.
+    * Process the log sequentially.
+    * Use fixed patterns instead of complex regular expressions where possible.
+    * Process only the required fields.
+    * Avoid repeatedly opening and reading the same file.
+For example, if only error entries are required:
+awk '$3 == "ERROR" {count++} END {print count+0}' /var/log/application.log
+This directly checks the required field without creating intermediate files.
+Performance Measurement:
+The execution time can be measured using:
+/usr/bin/time -f "Execution time: %E" ./process_logs.sh
+The administrator can verify that the script completes within the required 2-minute limit.
+Processing Flow:
+        1 Million Log Entries
+                 |
+                 v
+          Read Log File Once
+                 |
+                 v
+              AWK
+        +--------+--------+
+        |        |        |
+        v        v        v
+      Total    Errors   Warnings
+        |        |        |
+        +--------+--------+
+                 |
+                 v
+          Display Results
+                 |
+                 v
+       Check Execution Time
+Why awk is Suitable?
+  awk is suitable because it can perform multiple operations while reading the file sequentially. Instead of repeatedly scanning a 1-million-entry file with separate commands, one awk command can collect several statistics in a single pass.
+Commands such as grep, sort, and wc are still useful when their specific functionality is required, but unnecessary pipelines should be avoided for this workload.
+Conclusion:
+  For processing 1 million log entries per day within 2 minutes, an optimized shell script using awk is an efficient solution. Processing the file in a single pass, avoiding temporary files and unnecessary pipelines, and measuring execution time help reduce processing overhead and improve performance. The solution therefore satisfies the requirement of high-speed log processing using shell scripting.
+
+Q4. Process Management Strategy for a Faulty Linux Process
+  A Linux system is running several background services, but one faulty process is using 90% of the CPU. The system should not be restarted, and critical services must continue working normally. Therefore, the administrator should first identify the process, monitor it, and then control or terminate it safely.
+1. Identify the Faulty Process
+The top command can be used to identify processes consuming high CPU:
+top
+The administrator can check the %CPU column and identify the process using around 90% CPU.
+Another option is:
+ps aux --sort=-%cpu | head
+This displays processes in descending order of CPU usage.
+Example:
+USER   PID   %CPU   COMMAND
+root   2456  90.2   faulty_app
+Here, 2456 is the Process ID (PID) of the faulty process.
+2. Monitor the Process
+Before stopping the process, its behavior should be monitored.
+top -p 2456
+This continuously displays CPU usage for that particular process.
+The administrator can also use:
+ps -p 2456 -o pid,ppid,stat,%cpu,%mem,cmd
+This provides information about the process, including its PID, parent process, CPU usage, memory usage, and command.
+3. Reduce CPU Priority
+If the process is not critical, its CPU priority can be reduced using renice.
+sudo renice 10 -p 2456
+This gives the process a higher nice value, reducing its CPU scheduling priority.
+This is a safer first step because the process is not immediately terminated.
+4. Limit CPU Usage
+If the process continues consuming excessive CPU, its CPU usage can be controlled using appropriate Linux resource-control mechanisms.
+For example, with systemd-managed services, CPU limits can be configured so that the faulty service cannot consume all available CPU resources.
+The administrator should avoid restricting critical services unnecessarily.
+5. Terminate the Faulty Process
+If reducing its priority does not solve the problem, the process can be terminated gracefully:
+kill 2456
+The SIGTERM signal gives the process an opportunity to terminate properly.
+If the process does not respond, a stronger signal can be used:
+kill -9 2456
+SIGKILL immediately terminates the process and should only be used when necessary.
+Process Management Flow:
+        High CPU Usage
+              |
+              v
+        Run top / ps
+              |
+              v
+     Identify Faulty PID
+              |
+              v
+       Monitor Process
+              |
+              v
+    Reduce Priority (renice)
+              |
+         +----+----+
+         |         |
+       Normal    Still High
+         |         |
+         v         v
+       Keep     Terminate
+                Process
+                   |
+                   v
+             Check Services
+Protecting Critical Services:
+Before terminating the process, the administrator should check whether it is a critical system service.
+The running services can be checked using:
+    systemctl --type=service --state=running
+After controlling the faulty process, the administrator should verify that important services are still running.
+    systemctl --failed
+If a critical service is affected, it should be restarted individually rather than restarting the entire system.
+For example:
+    sudo systemctl restart service_name
+Conclusion
+  The safest approach is to identify the high-CPU process using top or ps, monitor it, reduce its priority using renice, and terminate it only if necessary. Critical services should be checked before and after the action. This solves the CPU problem without rebooting the Linux system and minimizes the effect on other services.
+
+Q5. Efficient Resource Allocation for 5 Virtual Machines:
+  A physical server has 16 GB of RAM and needs to run 5 virtual machines (VMs). Each VM requires a minimum of 2 GB RAM, while the host operating system requires 4 GB RAM. The main challenge is to allocate the available memory so that all VMs can operate smoothly.
+Memory Calculation:
+Memory required by the host OS:
+Host OS = 4 GB
+Memory required by 5 VMs:
+5 × 2 GB = 10 GB
+Total minimum required:
+4 GB + 10 GB = 14 GB
+Available memory:
+16 GB
+Therefore, after giving the minimum memory to all VMs and the host:
+16 GB - 14 GB = 2 GB
+There are 2 GB remaining for additional allocation.
+Proposed Allocation
+Component	    RAM
+Host OS	      4 GB
+VM1	          2 GB
+VM2	          2 GB
+VM3	          2 GB
+VM4	          2 GB
+VM5	          2 GB
+Remaining	    2 GB
+Total	        16 GB
+The minimum allocation can therefore be:
+              Physical Server
+                  16 GB RAM
+                      |
+        +-------------+-------------+
+        |                           |
+     Host OS                    Virtualization
+      4 GB                         Layer
+                                      |
+             +------+------+------+------+------+
+             |      |      |      |      |
+            VM1    VM2    VM3    VM4    VM5
+            2 GB   2 GB   2 GB   2 GB   2 GB
+             Remaining RAM = 2 GB
+Efficient Allocation Strategy:
+  * Initially, each VM should receive its required 2 GB and the host should retain 4 GB.
+  * The remaining 2 GB should not be permanently assigned unnecessarily. It can be used as additional memory for VMs when workload increases.
+For example:
+VM	    Minimum RAM	    Possible Additional RAM
+VM1	      2 GB	          +512 MB
+VM2	      2 GB	          +512 MB
+VM3	      2 GB	          +512 MB
+VM4	      2 GB	          +512 MB
+VM5	      2 GB	           Based on workload
+The exact distribution can be changed according to workload. A VM running a memory-intensive application can receive more RAM, while an idle VM can remain at its minimum allocation.
+Virtualization Concepts:
+    * The virtualization platform can use dynamic memory allocation so that unused memory can be reassigned when required.
+The administrator should also monitor:
+    * Host RAM usage
+    * Individual VM RAM usage
+    * Memory pressure
+    * Swap usage
+    * VM workload
+If one VM requires additional memory, available RAM can be allocated to it without unnecessarily taking memory away from the host.
+Important Consideration:
+The host must always retain its required 4 GB RAM. Therefore, the full 16 GB should not be assigned to the VMs.
+16 GB Total
+   |
+   +-- 4 GB → Host OS
+   |
+   +-- 10 GB → 5 VMs × 2 GB
+   |
+   +-- 2 GB → Flexible/Additional allocation
+This ensures that the host operating system and all five VMs have sufficient memory.
+Conclusion
+  The 16 GB RAM can support all five VMs because the minimum requirement is 14 GB, leaving 2 GB available for additional or dynamic allocation. Each VM receives at least 2 GB, while the host retains 4 GB. Using dynamic memory allocation and monitoring allows the remaining RAM to be distributed according to workload, helping all VMs operate smoothly without exceeding the available physical memory.
