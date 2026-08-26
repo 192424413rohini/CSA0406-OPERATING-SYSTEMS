@@ -1,0 +1,107 @@
+NAME:S.ROHINI
+REG.NO:192424413
+CODE:CSA0406 
+COURSE:OPERATING SYSTEMS
+C05-AT2
+
+Q1.File System Space Management:
+BEGIN
+    SET threshold = 80%
+    WHILE TRUE DO
+        usage = GET_DISK_USAGE()
+        IF usage > threshold THEN
+            PRINT "Disk usage is above 80%"
+            log_files = GET_LOG_FILES()
+            SORT log_files BY size DESCENDING
+            FOR each file IN log_files DO
+                IF file is old THEN
+                    COMPRESS file
+                ELSE
+                    DELETE file
+                ENDIF
+                usage = GET_DISK_USAGE()
+                IF usage <= threshold THEN
+                    PRINT "Disk usage is back to normal"
+                    BREAK
+                ENDIF
+            ENDFOR
+        ELSE
+            PRINT "Disk usage is normal"
+        ENDIF
+        WAIT for monitoring interval
+   ENDWHILE
+END
+
+Q2. Priority-Based CPU Scheduling
+BEGIN
+    INPUT process_list
+    SORT process_list BY priority DESCENDING
+    WHILE process_list IS NOT EMPTY DO
+        SELECT process WITH highest priority
+        ALLOCATE CPU time to selected process
+        EXECUTE process
+        IF process is completed THEN
+            REMOVE process FROM process_list
+        ELSE
+            REDUCE its priority slightly
+            ADD process BACK to process_list
+        ENDIF
+        SORT process_list BY priority DESCENDING
+    ENDWHILE
+    PRINT "All processes completed"
+END
+
+Q3. RAM Allocation Among Virtual Machines
+BEGIN
+    SET total_RAM = 16 GB
+    SET host_reserved = 4 GB
+    available_RAM = total_RAM - host_reserved
+    INPUT number_of_VMs
+    SET min_RAM = 2 GB
+    FOR i = 1 TO number_of_VMs DO
+        IF available_RAM >= min_RAM THEN
+            ALLOCATE min_RAM TO VM[i]
+            available_RAM = available_RAM - min_RAM
+            PRINT "2 GB allocated to VM", i
+        ELSE
+            PRINT "Insufficient memory for VM", i
+            BREAK
+        ENDIF
+    ENDFOR
+    PRINT "Remaining RAM =", available_RAM
+END
+
+Q4. Hypervisor Selection
+BEGIN
+    INPUT performance_required
+    INPUT budget
+    INPUT hardware_access
+    IF performance_required = HIGH AND hardware_access = TRUE THEN
+        selected_hypervisor = "Type 1 Hypervisor"
+        PRINT "Type 1 Hypervisor selected"
+        PRINT "Reason: High performance and direct hardware access"
+    ELSE IF budget = LOW THEN
+        selected_hypervisor = "Type 2 Hypervisor"
+        PRINT "Type 2 Hypervisor selected"
+        PRINT "Reason: Suitable for low-budget environments"
+    ELSE
+        selected_hypervisor = "Type 1 Hypervisor"
+        PRINT "Type 1 Hypervisor selected"
+    ENDIF
+    PRINT "Selected Hypervisor =", selected_hypervisor
+END
+
+Q5. CPU and Memory Resource Limiting
+BEGIN
+    INPUT application_list
+    FOR each app IN application_list DO
+        CREATE cgroup FOR app
+        INPUT CPU_limit
+        INPUT memory_limit
+        SET CPU limit FOR app
+        SET memory limit FOR app
+        ASSIGN app process TO cgroup
+        PRINT "Resource limits applied to", app
+    ENDFOR
+    PRINT "CPU and memory usage are being controlled"
+END
