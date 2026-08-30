@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+int main() {
+    int fd;
+    char data[] = "Operating System";
+    char buffer[50];
+    fd = open("sample.txt", O_CREAT | O_WRONLY, 0644);
+    write(fd, data, sizeof(data));
+    close(fd);
+    fd = open("sample.txt", O_RDONLY);
+    read(fd, buffer, sizeof(buffer));
+    close(fd);
+    printf("File data: %s\n", buffer);
+    return 0;
+}
