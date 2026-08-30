@@ -1,0 +1,19 @@
+#include <stdio.h>
+#include <stdlib.h>
+int main()
+{
+    printf("Linux File Access Permissions\n\n");
+    printf("r = Read\n");
+    printf("w = Write\n");
+    printf("x = Execute\n\n");
+    printf("User Types:\n");
+    printf("1. Owner\n");
+    printf("2. Group\n");
+    printf("3. Others\n\n");
+    printf("Example Permission: rwxr-xr--\n");
+    printf("Owner : rwx\n");
+    printf("Group : r-x\n");
+    printf("Others: r--\n\n");
+    printf("Use 'ls -l' to view file permissions.\n");
+    return 0;
+}
